@@ -112,7 +112,7 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            yield return new WaitForSeconds(2F);
+            yield return new WaitForSeconds(0.5F);
 
             foreach (MatchInfo matchInfo in matches)
             {
@@ -130,11 +130,13 @@ public class GameManager : MonoBehaviour
 
             // ----------------------------------------------
             // Step 3: tiles fall down
-            _board.MoveTiles();
+            _board.MoveTiles(5F);
+
+            yield return new WaitForSeconds(1F);
 
             _board.FillEmptySpaces();
 
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(0.5F);
 
             // ----------------------------------------------
             // Step 4: find new matches

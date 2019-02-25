@@ -45,7 +45,7 @@ public class Board : MonoBehaviour
         _tiles[x, y] = newTile;
     }
 
-    public void MoveTiles(int fallDirectionX = 0, int fallDirectionY = -1)
+    public void MoveTiles(float movementSpeed, int fallDirectionX = 0, int fallDirectionY = -1)
     {
         Vector2Int fallDirection = new Vector2Int(fallDirectionX, fallDirectionY);
 
@@ -66,7 +66,9 @@ public class Board : MonoBehaviour
 
                     if (searchCoordinates.IsBetween(Vector2Int.zero, Dimensions))
                     {
-                        SwapTiles(currentCoordinates, searchCoordinates);
+                        float movementDuration = Vector2.Distance(currentCoordinates, searchCoordinates) / movementSpeed;
+
+                        SwapTiles(currentCoordinates, searchCoordinates, movementDuration);
                     }
                 }
             }
@@ -87,7 +89,7 @@ public class Board : MonoBehaviour
 
                     do
                     {
-                        int index = Random.Range(0, possibleSprites.Count - 1);
+                        int index = Random.Range(0, possibleSprites.Count);
                         Sprite sprite = possibleSprites[index];
 
                         System.Predicate<BoardTile> hasMatchingSprite = (t => t != null && BoardTile.TypeToSpriteLookup[t.Type] == sprite);
@@ -122,7 +124,7 @@ public class Board : MonoBehaviour
         SwapTiles(tile1.Coordinates, tile2.Coordinates);
     }
 
-    public void SwapTiles(Vector2Int tile1Coordinates, Vector2Int tile2Coordinates)
+    public void SwapTiles(Vector2Int tile1Coordinates, Vector2Int tile2Coordinates, float visualSwapDuration = 0F)
     {
         BoardTile tile1 = GetTileAt(tile1Coordinates);
         BoardTile tile2 = GetTileAt(tile2Coordinates);
@@ -130,13 +132,15 @@ public class Board : MonoBehaviour
         if (tile1 != null)
         {
             tile1.Coordinates = tile2Coordinates;
-            tile1.transform.localPosition = new Vector3(tile2Coordinates.x, tile2Coordinates.y);
+            Vector3 target = transform.position + new Vector3(tile2Coordinates.x, tile2Coordinates.y);
+            tile1.StartMovingTo(target, visualSwapDuration);
         }
 
         if (tile2 != null)
         {
             tile2.Coordinates = tile1Coordinates;
-            tile2.transform.localPosition = new Vector3(tile1Coordinates.x, tile1Coordinates.y);
+            Vector3 target = transform.position + new Vector3(tile1Coordinates.x, tile1Coordinates.y);
+            tile2.StartMovingTo(target, visualSwapDuration);
         }
 
         _tiles[tile1Coordinates.x, tile1Coordinates.y] = tile2;

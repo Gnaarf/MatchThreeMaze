@@ -28,6 +28,8 @@ public class BoardTile : MonoBehaviour
 
     public float lastTimeOfMovement;
 
+    Coroutine _movementCoroutine;
+
     /// <summary>coordinates of this tile on the board. Managed by Board intstance</summary>
     public Vector2Int Coordinates{get;set;}
 
@@ -95,6 +97,42 @@ public class BoardTile : MonoBehaviour
         _spriteRenderer = GetComponent<SpriteRenderer>();
 
         defaultLocalScale = transform.localScale;
+    }
+
+    public void StartMovingTo(Vector2 targetPosition, float duration)
+    {
+        if(_movementCoroutine != null)
+        {
+            StopCoroutine(_movementCoroutine);
+        }
+
+        _movementCoroutine = StartCoroutine(MovementCoroutine(targetPosition, duration));
+    }
+
+    private IEnumerator MovementCoroutine(Vector3 targetPosition, float duration)
+    {
+        if (duration > 0F)
+        {
+            Vector3 startPositon = transform.position;
+
+            Vector3 startToTargetVector = targetPosition - startPositon;
+
+            float distanceLeft = startToTargetVector.magnitude;
+
+            Vector3 movementDirection = startToTargetVector / distanceLeft;
+
+            float speed = distanceLeft / duration;
+
+            while (distanceLeft > 0F)
+            {
+                transform.position += movementDirection * Time.deltaTime * speed;
+
+                distanceLeft -= Time.deltaTime * speed;
+
+                yield return new WaitForEndOfFrame();
+            }
+        }
+        transform.position = targetPosition;
     }
 
     public void Initialize(Sprite sprite, Vector2Int coordinates)
