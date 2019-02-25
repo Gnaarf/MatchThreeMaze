@@ -194,7 +194,10 @@ public class Board : MonoBehaviour
 
     public void DestroyTileAt(int x, int y)
     {
-        Destroy(_tiles[x, y].gameObject);
+        if (_tiles[x, y] != null)
+        {
+            Destroy(_tiles[x, y].gameObject);
+        }
         _tiles[x, y] = null;
     }
 
